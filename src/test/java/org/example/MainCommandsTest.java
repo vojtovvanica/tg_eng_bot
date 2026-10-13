@@ -32,13 +32,19 @@ class MainCommandsTest {
         assertEquals("cat - кот", commands.get(1L, "cat"));
     }
 
-    /*@Test
+    @Test
     void edit() {
+    commands.add(1L, "cat", "кот");
+    commands.edit(1L, "cat", "кошка");
+    assertEquals("cat - кошка", commands.get(1L, "cat"));
     }
 
     @Test
     void view() {
-    }*/
+        commands.add(1L, "cat", "кот");
+        commands.add(1L, "dog", "собака");
+        assertEquals("Ваш список слов: \ncat - кот\ndog - собака", commands.view(1L));
+    }
     @Test
     void IsolateUsers() {
         commands.add(1L, "cat", "кот");
