@@ -27,16 +27,7 @@ public class WordMemory {
     /**Метод который удаляет пару слов из списка*/
     public boolean delete(long chatId, String word){
         List<WordBase> list = listForUser(chatId);
-        boolean deleted = false;
-        Iterator<WordBase> currentWord = list.iterator();
-        while(currentWord.hasNext()){
-            WordBase p = currentWord.next();
-            if(p.getWord().equals(word)){
-                currentWord.remove();
-                deleted = true;
-            }
-        }
-        return deleted;
+        return list.remove(new WordBase(word, ""));
 
     }
     /**Метод для поиска слова в списке пользователя*/

@@ -1,5 +1,5 @@
 package org.example;
-import org.example.Functions;
+
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 /**Точка входа в телеграм бот*/
 public class Main{
@@ -12,7 +12,7 @@ public class Main{
             return;
         }
         try (TelegramBotsLongPollingApplication botsAplication = new TelegramBotsLongPollingApplication()){
-            botsAplication.registerBot(botToken, new Functions(botToken));
+            botsAplication.registerBot(botToken, new Bot(botToken));
             System.out.println("The bot is running");
             Thread.currentThread().join();
         }catch (Exception e) {
