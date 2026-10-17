@@ -1,36 +1,56 @@
 package org.example;
+
 import java.util.*;
 
-/**Класс который реализует хранение слов в памяти*/
+/**
+ * Класс который реализует хранение слов в памяти
+ */
 public class WordMemory {
     private final Map<Long, List<WordBase>> data = new HashMap<>();
-    /**Метод который проверяет существует ли лист для конкретного пользователя по ID чата
-     * @return list*/
-    private List<WordBase> listForUser(long chatId){
+
+    /**
+     * Метод который проверяет существует ли лист для конкретного пользователя по ID чата
+     *
+     * @return list
+     */
+    private List<WordBase> listForUser(long chatId) {
         List<WordBase> list = data.get(chatId);
-        if (list == null){
+        if (list == null) {
             list = new ArrayList<>();
             data.put(chatId, list);
         }
         return list;
     }
-    /**Добавляет пару слов в словарь*/
-    public void add(long chatId, WordBase pair){
+
+    /**
+     * Добавляет пару слов в словарь
+     */
+    public void add(long chatId, WordBase pair) {
         listForUser(chatId).add(pair);
     }
-    /**Возвращает все слова которые пользователь добавил в словарб
+
+    /**
+     * Возвращает все слова которые пользователь добавил в словарб
      * С помощью копирования из общего словаря
-     * @return new ArrayList<>*/
-    public List<WordBase> getAll(long chatId){
+     *
+     * @return new ArrayList<>
+     */
+    public List<WordBase> getAll(long chatId) {
         return new ArrayList<>(listForUser(chatId));
     }
-    /**Метод который удаляет пару слов из списка*/
-    public boolean delete(long chatId, String word){
+
+    /**
+     * Метод который удаляет пару слов из списка
+     */
+    public boolean delete(long chatId, String word) {
         List<WordBase> list = listForUser(chatId);
         return list.remove(new WordBase(word, ""));
 
     }
-    /**Метод для поиска слова в списке пользователя*/
+
+    /**
+     * Метод для поиска слова в списке пользователя
+     */
     public WordBase findByWord(long chatId, String word) {
         List<WordBase> list = listForUser(chatId);
         Iterator<WordBase> iterator = list.iterator();
@@ -44,7 +64,10 @@ public class WordMemory {
         }
         return null;
     }
-    /** Количество слов у пользователя. */
+
+    /**
+     * Количество слов у пользователя.
+     */
     public int size(long chatId) {
         return listForUser(chatId).size();
     }
