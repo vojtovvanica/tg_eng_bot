@@ -289,7 +289,7 @@ public class MainCommands {
             return "Введите корректное название";
         }
         if (instance.addDictionary(chatId, dictionary)) {
-            return "Словарь " + dictionary + "создан";
+            return "Словарь" + " " + dictionary + " " + "создан";
         } else {
             return "У вас уже есть словарь с таким названием";
         }
