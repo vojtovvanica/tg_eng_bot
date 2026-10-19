@@ -1,36 +1,85 @@
 package org.example;
+
 import java.util.*;
 
-/**Класс который реализует хранение слов в памяти*/
+/**
+ * Класс который реализует хранение слов в памяти
+ */
 public class WordMemory {
-    private final Map<Long, List<WordBase>> data = new HashMap<>();
-    /**Метод который проверяет существует ли лист для конкретного пользователя по ID чата
-     * @return list*/
-    private List<WordBase> listForUser(long chatId){
-        List<WordBase> list = data.get(chatId);
-        if (list == null){
-            list = new ArrayList<>();
-            data.put(chatId, list);
-        }
-        return list;
+    private final Map<Long, Map<String, List<WordBase>>> data = new HashMap<>();
+    private final Map<Long, String> openDictionary = new HashMap<>();
+    private final WorkWithFile fileWorker = new WorkWithFile();
+
+    public WordMemory() {
+        fileWorker.readFromFile(this.data);
     }
-    /**Добавляет пару слов в словарь*/
-    public void add(long chatId, WordBase pair){
+
+    /**
+     * Метод для получения всех словарей пользователя
+     * Возвращает список созданных словарей
+     *
+     */
+    private Map<String, List<WordBase>> dictionariesForUser(long chatId) {
+        Map<String, List<WordBase>> userDicts = data.get(chatId);
+        if (userDicts == null) {
+            userDicts = new HashMap<>();
+            data.put(chatId, userDicts);
+        }
+        return userDicts;
+    }
+
+    /**
+     * Метод для получения слов из открытого словаря пользователя
+     *
+     */
+
+    private List<WordBase> listForUser(long chatId) {
+        String openDictName = openDictionary.get(chatId);
+        if (openDictName == null) {
+            return new ArrayList<>();
+        }
+        Map<String, List<WordBase>> userDicts = dictionariesForUser(chatId);
+        List<WordBase> words = userDicts.get(openDictName);
+        if (words == null) {
+            words = new ArrayList<>();
+            userDicts.put(openDictName, words);
+        }
+        return words;
+    }
+
+    /**
+     * Добавляет пару слов в словарь
+     */
+    public void add(long chatId, WordBase pair) {
         listForUser(chatId).add(pair);
     }
-    /**Возвращает все слова которые пользователь добавил в словарб
+
+    /**
+     * Возвращает все слова которые пользователь добавил в словарб
      * С помощью копирования из общего словаря
-     * @return new ArrayList<>*/
-    public List<WordBase> getAll(long chatId){
+     *
+     * @return new ArrayList<>
+     */
+    public List<WordBase> getAll(long chatId) {
         return new ArrayList<>(listForUser(chatId));
     }
-    /**Метод который удаляет пару слов из списка*/
-    public boolean delete(long chatId, String word){
+
+    /**
+     * Метод который удаляет пару слов из списка
+     */
+    public boolean delete(long chatId, String word) {
         List<WordBase> list = listForUser(chatId);
         return list.remove(new WordBase(word, ""));
 
     }
-    /**Метод для поиска слова в списке пользователя*/
+
+    public Map<Long, Map<String, List<WordBase>>> getData() {
+        return this.data;
+    }
+
+    /**
+     * Метод для поиска слова в списке пользователя
+     */
     public WordBase findByWord(long chatId, String word) {
         List<WordBase> list = listForUser(chatId);
         Iterator<WordBase> iterator = list.iterator();
@@ -44,8 +93,79 @@ public class WordMemory {
         }
         return null;
     }
-    /** Количество слов у пользователя. */
+
+
+    /**
+     * Количество слов у пользователя.
+     */
     public int size(long chatId) {
         return listForUser(chatId).size();
     }
+
+    /**
+     * Метод, который возвращает список словарей,
+     * созданыых пользователем
+     *
+     */
+    public List<String> getDictionaryNames(long chatId) {
+        return new ArrayList<>(dictionariesForUser(chatId).keySet());
+    }
+
+    /**
+     * Метод, для открытия словаря с нужными словами
+     *
+     */
+
+    public boolean openDictionary(long chatId, String dictName) {
+        if (dictionariesForUser(chatId).containsKey(dictName)) {
+            openDictionary.put(chatId, dictName);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Метод для закрытия словаря
+     *
+     */
+    public void closeDictionary(long chatId) {
+        openDictionary.remove(chatId);
+    }
+
+    /**
+     * Метод, который возвращает название открытого словаря
+     */
+    public String getOpenDictionary(long chatId) {
+        return openDictionary.get(chatId);
+    }
+
+    /**
+     * Метод для реализации команды добавления нового словаря
+     * Проверяет существует ли в списке словарей пользователя словарь
+     * с таким значением, если нет создает его
+     */
+    public boolean addDictionary(long chatId, String dictName) {
+        Map<String, List<WordBase>> userDicts = dictionariesForUser(chatId);
+        if (userDicts.containsKey(dictName)) {
+            return false;
+        }
+        userDicts.put(dictName, new ArrayList<>());
+        return true;
+    }
+
+
+    /**
+     * Метод для реализации команды удаления словаря
+     */
+    public boolean deleteDictionary(long chatId, String dictName) {
+        Map<String, List<WordBase>> userDicts = dictionariesForUser(chatId);
+        boolean removed = userDicts.remove(dictName) != null;
+        if (removed && dictName.equals(openDictionary.get(chatId))) {
+            openDictionary.remove(chatId);
+        }
+
+        return removed;
+    }
+
+
 }

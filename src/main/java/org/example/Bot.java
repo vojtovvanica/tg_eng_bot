@@ -6,19 +6,16 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 /** Бот, работающий в режиме long polling
- * Класс реализует интерфейс LongPollingSingleThreadUpdateConsumer,
- * Каждое входящее текстовое сообщение бот пересылает обратно пользователю
+ * Класс реализует интерфейс LongPollingSingleThreadUpdateConsumer
  */
 public class Bot implements LongPollingSingleThreadUpdateConsumer {
     /** Клиент для отправки запросов в Telegram Bot  */
     private final TelegramClient telegramClient;
-    private final MainCommands commands = new MainCommands();
-    /**
-     * Создаёт бота и инициализирует клиента для работы с Telegram Bot
-     * @param botToken
-     */
-    public Bot(String botToken) {
+    private final MainCommands commands;
+
+    public Bot(String botToken, MainCommands commands) {
         telegramClient = new OkHttpTelegramClient(botToken);
+        this.commands = commands;
 
     }
     /**
