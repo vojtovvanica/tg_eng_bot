@@ -9,8 +9,8 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 /**
  * Бот, работающий в режиме long polling
- * Класс реализует интерфейс LongPollingSingleThreadUpdateConsumer,
- * Каждое входящее текстовое сообщение бот пересылает обратно пользователю
+ * Класс реализует интерфейс LongPollingSingleThreadUpdateConsumer
+ * Бот для изучения английских слов
  */
 public class Bot implements LongPollingSingleThreadUpdateConsumer {
     /**
