@@ -151,6 +151,9 @@ public class MainCommands {
     public String help() {
         return """
                 Доступные команды:
+                /addDict - добавить новый словарь
+                /deleteDict - удалить словарь
+                /viewDict - посмотреть список созданных словарей
                 /add word translation - добавить пару слов
                 /delete word - удалить слово
                 /get word - посмотреть перевод слова
@@ -289,7 +292,8 @@ public class MainCommands {
             return "Введите корректное название";
         }
         if (instance.addDictionary(chatId, dictionary)) {
-            return "Словарь" + " " + dictionary + " " + "создан";
+            fileWorker.saveToFile(instance.getData());
+            return "Словарь" + " " + dictionary + " " + " создан";
         } else {
             return "У вас уже есть словарь с таким названием";
         }
@@ -306,7 +310,8 @@ public class MainCommands {
             return "Введите корректное название";
         }
         if (instance.deleteDictionary(chatId, dictionary)) {
-            return "Словарь " + dictionary + "удален";
+            fileWorker.saveToFile(instance.getData());
+            return "Словарь " + dictionary + " удален";
         } else {
             return "Словаря с таким названием не существует";
         }

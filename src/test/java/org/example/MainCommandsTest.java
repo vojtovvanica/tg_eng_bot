@@ -181,6 +181,29 @@ class MainCommandsTest {
         commands.delete(1L, "apple");
         commands.deleteDict(1L, "food");
     }
+    /*
+    @Test
+    void testSaveAndLoad() {
+        WordMemory memory1 = new WordMemory();
+        memory1.addDictionary(1L, "family");
+        memory1.openDictionary(1L, "family");
+        memory1.add(1L, new WordBase("cat", "кот"));
+        WorkWithFile fileWorker = new WorkWithFile();
+        fileWorker.saveToFile(memory1.getData());
+        WordMemory memory2 = new WordMemory();
+        fileWorker.readFromFile(memory2.getData());
+        assertTrue(memory2.getDictionaryNames(1L).contains("family"));
+
+        memory2.openDictionary(1L, "family");
+        assertEquals(1, memory2.size(1L));
+        assertEquals("cat", memory2.getAll(1L).get(0).getWord());
+
+        memory1.deleteDictionary(1L, "family");
+        fileWorker.saveToFile(memory1.getData());
+        memory2.deleteDictionary(2L, "family");
+        fileWorker.saveToFile(memory2.getData());
+
+    }*/
 
 
 }
