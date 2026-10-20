@@ -167,5 +167,17 @@ public class WordMemory {
         return removed;
     }
 
+    public List<WordBase> getWordsFromDictionary(long chatId, String dictionaryName) {
+        Map<String, List<WordBase>> userDicts = dictionariesForUser(chatId);
+        List<WordBase> words = userDicts.get(dictionaryName);
+        List<WordBase> result;
+        if (words == null) {
+            result = new ArrayList<>();
+        } else {
+            result = new ArrayList<>(words);
+        }
+        return result;
+    }
+
 
 }

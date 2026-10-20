@@ -33,7 +33,7 @@ public class WordBase {
     }
 
     /**
-     * Метод который меняет перевоод слова
+     * Метод который меняет перевод слова
      */
     public void changeTranslation(String newWord) {
         this.wordTranslation = newWord;

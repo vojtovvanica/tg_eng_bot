@@ -9,13 +9,19 @@ public class MainCommands {
 
     private final WordMemory instance;
     private final WorkWithFile fileWorker = new WorkWithFile();
+    private final Game game;
 
     public MainCommands(WordMemory memory) {
+
         this.instance = memory;
+        this.game = new Game(memory);
     }
 
     /*** Разбирает текстовое сообщение и возвращает ответ бота.*/
     public String handle(long chatId, String text) {
+        if (game.isUserPlaying(chatId)) {
+            return game.handleAnswer(chatId, text);
+        }
         String[] parts = text.trim().split("\\s+", 3);
         String command = parts[0];
 
@@ -42,6 +48,11 @@ public class MainCommands {
                 return handleViewDict(chatId);
             case "/deleteDict":
                 return handleDeleteDict(chatId, parts);
+            case "/startGame":
+                String dictName = parts.length > 1 ? parts[1] : null;
+                return game.startGame(chatId, dictName);
+            case "/stopGame":
+                return game.stopGame(chatId);
             default:
                 return "Неизвестная команда. Напишите /start";
         }
@@ -150,12 +161,26 @@ public class MainCommands {
      */
     public String help() {
         return """
-                Доступные команды:
+                Чтобы начать использоваание бота, создайте новый словарь с помощью
+                команды /addDict, а затем откройте словарь с помощью команды /openDict
+                После этого вам станут доступны следующие команды:
                 /add word translation - добавить пару слов
                 /delete word - удалить слово
                 /get word - посмотреть перевод слова
                 /edit word newTranslation - редактировать перевод слова
                 /view - посмотреть слова, которые уже добавлены
+                
+                Команды для работы со словарями:
+                /addDict - добавить новый словарь
+                /openDict - открыть словарь для записи
+                /viewDict - посмотреть список созданных словарей
+                /deleteDict - удалить словарь(при удалении словаря, все слова из него также удалятся)
+                
+                Также для проверки знаний слов существует игровой режим.
+                Во время использования, пользователь не может воспользоваться другими командами
+                /startGame - начать игровой режим
+                /stopGame - закончить игровой режим.
+                
                 """;
     }
 
@@ -168,7 +193,7 @@ public class MainCommands {
             return "Переключитесь на словарь, в который вы хотите добавить слова (команда /open)";
         }
         if (word == null || word.isBlank() || translation == null || translation.isBlank()) {
-            return "Пожалуйства введите пару слов корректно" +
+            return "Введите пару слов корректно" +
                     "example: add word translation";
         }
         if (instance.findByWord(chatId, word) != null) {
@@ -281,7 +306,7 @@ public class MainCommands {
 
     /**
      * Реализация команды addDict
-     * Проверяет существует ли словарь с такикм названием
+     * Проверяет существует ли словарь с таким названием
      * Если нет, то создает
      */
     public String addDict(long chatId, String dictionary) {
@@ -289,6 +314,7 @@ public class MainCommands {
             return "Введите корректное название";
         }
         if (instance.addDictionary(chatId, dictionary)) {
+            fileWorker.saveToFile(instance.getData());
             return "Словарь " + dictionary + "создан";
         } else {
             return "У вас уже есть словарь с таким названием";
@@ -306,6 +332,7 @@ public class MainCommands {
             return "Введите корректное название";
         }
         if (instance.deleteDictionary(chatId, dictionary)) {
+            fileWorker.saveToFile(instance.getData());
             return "Словарь " + dictionary + "удален";
         } else {
             return "Словаря с таким названием не существует";
