@@ -12,7 +12,7 @@ public class MainCommands {
 
     public MainCommands(WordMemory memory) {
         this.instance = memory;
-        this.fileWorker = memory.getFileWorker(); // Берем из памяти!
+        this.fileWorker = memory.getFileWorker();
         //this.game = new Game(memory);
     }
 
