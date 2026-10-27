@@ -18,7 +18,23 @@ import java.util.Map;
  */
 
 public class WorkWithFile {
-    private final Path filePath = Paths.get("englishWords.txt");
+    private final Path filePath;
+
+    /**
+     * Конструктор для бота
+     * Создает путь к папке data в корне проекта
+     */
+    public WorkWithFile() {
+        this.filePath = Paths.get("data", "englishWords.txt");
+    }
+
+    /**
+     * Конструктор для тестов
+     * Принимает путь к временной папке, которую создал JUnit.
+     */
+    public WorkWithFile(Path filePath) {
+        this.filePath = filePath;
+    }
 
     /**
      * Метод, который проверяет существование файла
@@ -26,6 +42,11 @@ public class WorkWithFile {
      */
     public void existenceOfTheFile() {
         try {
+            Path dir = filePath.getParent();
+            if (dir != null && !Files.exists(dir)) {
+                Files.createDirectories(dir);
+            }
+
             if (!Files.exists(filePath)) {
                 Files.createFile(filePath);
             }
@@ -56,7 +77,7 @@ public class WorkWithFile {
             }
         }
         try {
-            Files.write(filePath, File);
+            Files.write(this.filePath, File);
             System.out.println("Слова сохранены в файл");
         } catch (IOException e) {
             System.err.println("Произошла ошибка " + e.getMessage());
@@ -68,13 +89,11 @@ public class WorkWithFile {
      * Метод который при запуске кода читает слова и словари,
      * которые были записаны пользователями до этого и записывает их в Map
      * для дальнейшего использования
-     *
-     * @return Map<Long, List<WordBase>> data = new HashMap<>()
      */
     public void readFromFile(Map<Long, Map<String, List<WordBase>>> data) {
         existenceOfTheFile();
         data.clear();
-        try (BufferedReader reader = new BufferedReader(new FileReader("englishWords.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(this.filePath.toFile()))) {
 
             String line;
             while ((line = reader.readLine()) != null) {

@@ -8,13 +8,17 @@ import java.util.List;
 public class MainCommands {
 
     private final WordMemory instance;
-    private final WorkWithFile fileWorker = new WorkWithFile();
+    private final WorkWithFile fileWorker;
 
     public MainCommands(WordMemory memory) {
         this.instance = memory;
+        this.fileWorker = memory.getFileWorker(); // Берем из памяти!
+        //this.game = new Game(memory);
     }
 
-    /*** Разбирает текстовое сообщение и возвращает ответ бота.*/
+    /***
+     * Разбирает текстовое сообщение и возвращает ответ бота
+     */
     public String handle(long chatId, String text) {
         String[] parts = text.trim().split("\\s+", 3);
         String command = parts[0];
@@ -148,7 +152,7 @@ public class MainCommands {
      *
      * @return вспомогательный список с командами
      */
-    public String help() {
+    private String help() {
         return """
                 Доступные команды:
                 /addDict - добавить новый словарь
@@ -166,7 +170,7 @@ public class MainCommands {
      * Реализация команды add
      * добавляет новое слово в словарь
      */
-    public String add(long chatId, String word, String translation) {
+    private String add(long chatId, String word, String translation) {
         if (instance.getOpenDictionary(chatId) == null) {
             return "Переключитесь на словарь, в который вы хотите добавить слова (команда /open)";
         }
@@ -186,7 +190,7 @@ public class MainCommands {
     /**
      * Реализация команды delete
      */
-    public String delete(long chatId, String word) {
+    private String delete(long chatId, String word) {
         if (instance.getOpenDictionary(chatId) == null) {
             return "Переключитесь на словарь, из которого вы хотите удалить слово";
         }
@@ -202,7 +206,7 @@ public class MainCommands {
      *
      * @return перевод запрашиваемого слова
      */
-    public String get(long chatId, String word) {
+    private String get(long chatId, String word) {
         if (instance.getOpenDictionary(chatId) == null) {
             return "Переключитесь на словарь, из которого вы хотите удалить слово";
         }
@@ -218,7 +222,7 @@ public class MainCommands {
      * Реализация команды edit
      * редактирует перевод запрашиваемого слова
      */
-    public String edit(long chatId, String word, String newTranslation) {
+    private String edit(long chatId, String word, String newTranslation) {
         if (instance.getOpenDictionary(chatId) == null) {
             return "Переключитесь на словарь, из которого вы хотите удалить слово";
         }
@@ -236,7 +240,7 @@ public class MainCommands {
      *
      * @return список слов которые пользователь добавил в словарь
      */
-    public String view(long chatId) {
+    private String view(long chatId) {
         if (instance.getOpenDictionary(chatId) == null) {
             return "Переключитесь на словарь, из которого вы хотите удалить слово";
         }
@@ -254,7 +258,7 @@ public class MainCommands {
     /**
      * Реализация приветсвенной команды бота
      */
-    public String start(long chatId) {
+    private String start(long chatId) {
         if (instance.size(chatId) == 0) {
             return "Привет, я бот, который поможет тебе запомнить английские слова. \n" +
                     "У вас пока нет слов для обучения, хотите добавить слово? " +
@@ -269,7 +273,7 @@ public class MainCommands {
      * Проверяет существует ли словарь с такикм названием
      * Если да, то котрывает его
      */
-    public String open(long chatId, String dictionary) {
+    private String open(long chatId, String dictionary) {
         if (dictionary == null || dictionary.isBlank()) {
             return "Введите название словаря корректно";
         }
@@ -287,7 +291,7 @@ public class MainCommands {
      * Проверяет существует ли словарь с такикм названием
      * Если нет, то создает
      */
-    public String addDict(long chatId, String dictionary) {
+    private String addDict(long chatId, String dictionary) {
         if (dictionary == null || dictionary.isBlank()) {
             return "Введите корректное название";
         }
@@ -305,7 +309,7 @@ public class MainCommands {
      * Удаляет словарь и все слова из него с помощью
      * вызова метода deleteDictionary
      */
-    public String deleteDict(long chatId, String dictionary) {
+    private String deleteDict(long chatId, String dictionary) {
         if (dictionary == null || dictionary.isBlank()) {
             return "Введите корректное название";
         }
@@ -322,7 +326,7 @@ public class MainCommands {
      * Возвращает сообщение со списком созданных словарей
      */
 
-    public String viewDict(long chatId) {
+    private String viewDict(long chatId) {
         List<String> names = instance.getDictionaryNames(chatId);
         if (names.isEmpty()) {
             return "Вы еще не создали ни одного словаря";

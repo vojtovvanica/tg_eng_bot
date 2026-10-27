@@ -8,12 +8,21 @@ import java.util.*;
 public class WordMemory {
     private final Map<Long, Map<String, List<WordBase>>> data = new HashMap<>();
     private final Map<Long, String> openDictionary = new HashMap<>();
-    private final WorkWithFile fileWorker = new WorkWithFile();
+    private final WorkWithFile fileWorker;
 
     public WordMemory() {
-        fileWorker.readFromFile(this.data);
+        this.fileWorker = new WorkWithFile();
+        this.fileWorker.readFromFile(this.data);
     }
 
+    public WordMemory(WorkWithFile fileWorker) {
+        this.fileWorker = fileWorker;
+        this.fileWorker.readFromFile(this.data);
+    }
+
+    public WorkWithFile getFileWorker() {
+        return this.fileWorker;
+    }
     /**
      * Метод для получения всех словарей пользователя
      * Возвращает список созданных словарей
@@ -122,14 +131,6 @@ public class WordMemory {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Метод для закрытия словаря
-     *
-     */
-    public void closeDictionary(long chatId) {
-        openDictionary.remove(chatId);
     }
 
     /**
