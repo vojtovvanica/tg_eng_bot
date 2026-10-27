@@ -10,9 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Класс, тестриющий команды бота
  * Проверяет добавление, удаление, поиск и редактирование слов и
@@ -178,13 +175,13 @@ class MainCommandsTest {
 
         String result_1 = commands.handle(1L, "/view");
 
-        assertTrue(result_1.contains("apple"));
-        assertFalse(result_1.contains("cat"));
+        Assertions.assertTrue(result_1.contains("apple"));
+        Assertions.assertFalse(result_1.contains("cat"));
 
         commands.handle(1L, "/open animals");
         String result_2 = commands.handle(1L, "/view");
-        assertTrue(result_2.contains("cat"));
-        assertFalse(result_2.contains("apple"));
+        Assertions.assertTrue(result_2.contains("cat"));
+        Assertions.assertFalse(result_2.contains("apple"));
     }
 
     /**
@@ -195,8 +192,8 @@ class MainCommandsTest {
         commands.handle(1L, "/add cat кот");
         List<String> lines = Files.readAllLines(testFile);
 
-        assertTrue(lines.get(0).contains("cat"));
-        assertTrue(lines.get(0).contains("кот"));
+        Assertions.assertTrue(lines.get(0).contains("cat"));
+        Assertions.assertTrue(lines.get(0).contains("кот"));
     }
 
 
