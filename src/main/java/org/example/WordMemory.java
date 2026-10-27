@@ -23,6 +23,7 @@ public class WordMemory {
     public WorkWithFile getFileWorker() {
         return this.fileWorker;
     }
+
     /**
      * Метод для получения всех словарей пользователя
      * Возвращает список созданных словарей
@@ -39,7 +40,6 @@ public class WordMemory {
 
     /**
      * Метод для получения слов из открытого словаря пользователя
-     *
      */
 
     private List<WordBase> listForUser(long chatId) {
@@ -166,6 +166,40 @@ public class WordMemory {
         }
 
         return removed;
+    }
+
+    /**
+     * Метод, который получает слова из словаря
+     */
+    public List<WordBase> getWordsFromDictionary(long chatId, String dictionaryName) {
+        Map<String, List<WordBase>> userDicts = dictionariesForUser(chatId);
+        List<WordBase> words = userDicts.get(dictionaryName);
+        List<WordBase> result;
+        if (words == null) {
+            result = new ArrayList<>();
+        } else {
+            result = new ArrayList<>(words);
+        }
+        return result;
+    }
+
+    /**
+     * Метод для реализации функции поиска перевода слова по всем словарям
+     */
+    public String searchWordInAllDictionaries(long chatId, String word) {
+        List<String> results = new ArrayList<>();
+
+        for (Map.Entry<String, List<WordBase>> entry : dictionariesForUser(chatId).entrySet()) {
+            for (WordBase pair : entry.getValue()) {
+                if (pair.getWord().equalsIgnoreCase(word)) {
+                    results.add(entry.getKey() + ": " + pair.getWord() + " - " + pair.getTranslation());
+                }
+            }
+        }
+        if (results.isEmpty()) {
+            return "Слово \"" + word + "\" не найдено ни в одном словаре.";
+        }
+        return "Результаты поиска для \"" + word + "\":\n" + String.join("\n", results);
     }
 
 

@@ -196,5 +196,22 @@ class MainCommandsTest {
         Assertions.assertTrue(lines.get(0).contains("кот"));
     }
 
+    /**
+     * Тестирует функцию поиска одного слоав по всем словарям
+     */
+    @Test
+    void testFindWordInAllDictionaries() {
+        commands.handle(1L, "/addDict animals");
+        commands.handle(1L, "/open animals");
+        commands.handle(1L, "/add crane журавль");
+
+        commands.handle(1L, "/addDict object");
+        commands.handle(1L, "/open object");
+        commands.handle(1L, "/add crane кран");
+        String result = commands.handle(1L, "/find crane");
+        Assertions.assertTrue(result.contains("animals: crane - журавль"));
+        Assertions.assertTrue(result.contains("object: crane - кран"));
+    }
+
 
 }

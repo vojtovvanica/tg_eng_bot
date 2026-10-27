@@ -9,17 +9,20 @@ public class MainCommands {
 
     private final WordMemory instance;
     private final WorkWithFile fileWorker;
+    private final Game game;
 
     public MainCommands(WordMemory memory) {
+
         this.instance = memory;
         this.fileWorker = memory.getFileWorker();
-        //this.game = new Game(memory);
+        this.game = new Game(memory);
     }
 
-    /***
-     * Разбирает текстовое сообщение и возвращает ответ бота
-     */
+    /*** Разбирает текстовое сообщение и возвращает ответ бота.*/
     public String handle(long chatId, String text) {
+        if (game.isUserPlaying(chatId)) {
+            return game.handleAnswer(chatId, text);
+        }
         String[] parts = text.trim().split("\\s+", 3);
         String command = parts[0];
 
@@ -38,6 +41,8 @@ public class MainCommands {
                 return help();
             case "/edit":
                 return handleEdit(chatId, parts);
+            case "/find":
+                return handleFind(chatId, parts);
             case "/addDict":
                 return handleAddDict(chatId, parts);
             case "/open":
@@ -46,6 +51,11 @@ public class MainCommands {
                 return handleViewDict(chatId);
             case "/deleteDict":
                 return handleDeleteDict(chatId, parts);
+            case "/startGame":
+                String dictName = parts.length > 1 ? parts[1] : null;
+                return game.startGame(chatId, dictName);
+            case "/stopGame":
+                return game.handleAnswer(chatId, "/stopGame");
             default:
                 return "Неизвестная команда. Напишите /start";
         }
@@ -148,21 +158,45 @@ public class MainCommands {
     }
 
     /**
+     * Метод проверяет формат сообщения от пользователя
+     * Вызывает метод searchWordInAllDictionaries для поиска
+     * слова по всем словарям
+     */
+    private String handleFind(long chatId, String[] parts) {
+        if (parts.length < 2) {
+            return "Формат: /find word";
+        }
+        String word = parts[1];
+        return instance.searchWordInAllDictionaries(chatId, word);
+    }
+
+    /**
      * Реализация команды help
      *
      * @return вспомогательный список с командами
      */
-    private String help() {
+    public String help() {
         return """
-                Доступные команды:
-                /addDict - добавить новый словарь
-                /deleteDict - удалить словарь
-                /viewDict - посмотреть список созданных словарей
+                Чтобы начать использоваание бота, создайте новый словарь с помощью
+                команды /addDict, а затем откройте словарь с помощью команды /openDict
+                После этого вам станут доступны следующие команды:
                 /add word translation - добавить пару слов
                 /delete word - удалить слово
                 /get word - посмотреть перевод слова
                 /edit word newTranslation - редактировать перевод слова
                 /view - посмотреть слова, которые уже добавлены
+                
+                Команды для работы со словарями:
+                /addDict - добавить новый словарь
+                /openDict - открыть словарь для записи
+                /viewDict - посмотреть список созданных словарей
+                /deleteDict - удалить словарь(при удалении словаря, все слова из него также удалятся)
+                
+                Также для проверки знаний слов существует игровой режим.
+                Во время использования, пользователь не может воспользоваться другими командами
+                /startGame - начать игровой режим
+                /stopGame - закончить игровой режим.
+                
                 """;
     }
 
@@ -175,7 +209,7 @@ public class MainCommands {
             return "Переключитесь на словарь, в который вы хотите добавить слова (команда /open)";
         }
         if (word == null || word.isBlank() || translation == null || translation.isBlank()) {
-            return "Пожалуйства введите пару слов корректно" +
+            return "Введите пару слов корректно" +
                     "example: add word translation";
         }
         if (instance.findByWord(chatId, word) != null) {
@@ -288,7 +322,7 @@ public class MainCommands {
 
     /**
      * Реализация команды addDict
-     * Проверяет существует ли словарь с такикм названием
+     * Проверяет существует ли словарь с таким названием
      * Если нет, то создает
      */
     private String addDict(long chatId, String dictionary) {
@@ -297,7 +331,7 @@ public class MainCommands {
         }
         if (instance.addDictionary(chatId, dictionary)) {
             fileWorker.saveToFile(instance.getData());
-            return "Словарь" + " " + dictionary + " " + " создан";
+            return "Словарь " + dictionary + "создан";
         } else {
             return "У вас уже есть словарь с таким названием";
         }
@@ -315,7 +349,7 @@ public class MainCommands {
         }
         if (instance.deleteDictionary(chatId, dictionary)) {
             fileWorker.saveToFile(instance.getData());
-            return "Словарь " + dictionary + " удален";
+            return "Словарь " + dictionary + "удален";
         } else {
             return "Словаря с таким названием не существует";
         }
@@ -340,4 +374,3 @@ public class MainCommands {
     }
 
 }
-

@@ -20,18 +20,10 @@ import java.util.Map;
 public class WorkWithFile {
     private final Path filePath;
 
-    /**
-     * Конструктор для бота
-     * Создает путь к папке data в корне проекта
-     */
     public WorkWithFile() {
         this.filePath = Paths.get("data", "englishWords.txt");
     }
 
-    /**
-     * Конструктор для тестов
-     * Принимает путь к временной папке, которую создал JUnit.
-     */
     public WorkWithFile(Path filePath) {
         this.filePath = filePath;
     }
@@ -42,11 +34,6 @@ public class WorkWithFile {
      */
     public void existenceOfTheFile() {
         try {
-            Path dir = filePath.getParent();
-            if (dir != null && !Files.exists(dir)) {
-                Files.createDirectories(dir);
-            }
-
             if (!Files.exists(filePath)) {
                 Files.createFile(filePath);
             }
@@ -77,7 +64,7 @@ public class WorkWithFile {
             }
         }
         try {
-            Files.write(this.filePath, File);
+            Files.write(filePath, File);
             System.out.println("Слова сохранены в файл");
         } catch (IOException e) {
             System.err.println("Произошла ошибка " + e.getMessage());
