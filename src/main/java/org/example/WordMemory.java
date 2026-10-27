@@ -8,10 +8,20 @@ import java.util.*;
 public class WordMemory {
     private final Map<Long, Map<String, List<WordBase>>> data = new HashMap<>();
     private final Map<Long, String> openDictionary = new HashMap<>();
-    private final WorkWithFile fileWorker = new WorkWithFile();
+    private final WorkWithFile fileWorker;
 
     public WordMemory() {
-        fileWorker.readFromFile(this.data);
+        this.fileWorker = new WorkWithFile();
+        this.fileWorker.readFromFile(this.data);
+    }
+
+    public WordMemory(WorkWithFile fileWorker) {
+        this.fileWorker = fileWorker;
+        this.fileWorker.readFromFile(this.data);
+    }
+
+    public WorkWithFile getFileWorker() {
+        return this.fileWorker;
     }
 
     /**
@@ -125,14 +135,6 @@ public class WordMemory {
     }
 
     /**
-     * Метод для закрытия словаря
-     *
-     */
-    public void closeDictionary(long chatId) {
-        openDictionary.remove(chatId);
-    }
-
-    /**
      * Метод, который возвращает название открытого словаря
      */
     public String getOpenDictionary(long chatId) {
@@ -167,6 +169,9 @@ public class WordMemory {
         return removed;
     }
 
+    /**
+     * Метод, который получает слова из словаря
+     */
     public List<WordBase> getWordsFromDictionary(long chatId, String dictionaryName) {
         Map<String, List<WordBase>> userDicts = dictionariesForUser(chatId);
         List<WordBase> words = userDicts.get(dictionaryName);

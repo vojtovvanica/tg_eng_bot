@@ -18,7 +18,15 @@ import java.util.Map;
  */
 
 public class WorkWithFile {
-    private final Path filePath = Paths.get("englishWords.txt");
+    private final Path filePath;
+
+    public WorkWithFile() {
+        this.filePath = Paths.get("data", "englishWords.txt");
+    }
+
+    public WorkWithFile(Path filePath) {
+        this.filePath = filePath;
+    }
 
     /**
      * Метод, который проверяет существование файла
@@ -74,7 +82,7 @@ public class WorkWithFile {
     public void readFromFile(Map<Long, Map<String, List<WordBase>>> data) {
         existenceOfTheFile();
         data.clear();
-        try (BufferedReader reader = new BufferedReader(new FileReader("englishWords.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(this.filePath.toFile()))) {
 
             String line;
             while ((line = reader.readLine()) != null) {

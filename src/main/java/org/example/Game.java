@@ -76,7 +76,7 @@ public class Game {
      * Реализует завершение игры
      *
      */
-    public String stopGame(long chatId) {
+    private String stopGame(long chatId) {
         GameSession session = activeSession.remove(chatId);
         if (session == null) {
             return "Вы не находитесь в режиме игра. Если хотите запустить /startGame";
