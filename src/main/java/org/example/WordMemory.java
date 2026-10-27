@@ -6,20 +6,54 @@ import java.util.*;
  * Класс который реализует хранение слов в памяти
  */
 public class WordMemory {
-    private final Map<Long, List<WordBase>> data = new HashMap<>();
+    private final Map<Long, Map<String, List<WordBase>>> data = new HashMap<>();
+    private final Map<Long, String> openDictionary = new HashMap<>();
+    private final WorkWithFile fileWorker;
+
+    public WordMemory() {
+        this.fileWorker = new WorkWithFile();
+        this.fileWorker.readFromFile(this.data);
+    }
+
+    public WordMemory(WorkWithFile fileWorker) {
+        this.fileWorker = fileWorker;
+        this.fileWorker.readFromFile(this.data);
+    }
+
+    public WorkWithFile getFileWorker() {
+        return this.fileWorker;
+    }
+    /**
+     * Метод для получения всех словарей пользователя
+     * Возвращает список созданных словарей
+     *
+     */
+    private Map<String, List<WordBase>> dictionariesForUser(long chatId) {
+        Map<String, List<WordBase>> userDicts = data.get(chatId);
+        if (userDicts == null) {
+            userDicts = new HashMap<>();
+            data.put(chatId, userDicts);
+        }
+        return userDicts;
+    }
 
     /**
-     * Метод который проверяет существует ли лист для конкретного пользователя по ID чата
+     * Метод для получения слов из открытого словаря пользователя
      *
-     * @return list
      */
+
     private List<WordBase> listForUser(long chatId) {
-        List<WordBase> list = data.get(chatId);
-        if (list == null) {
-            list = new ArrayList<>();
-            data.put(chatId, list);
+        String openDictName = openDictionary.get(chatId);
+        if (openDictName == null) {
+            return new ArrayList<>();
         }
-        return list;
+        Map<String, List<WordBase>> userDicts = dictionariesForUser(chatId);
+        List<WordBase> words = userDicts.get(openDictName);
+        if (words == null) {
+            words = new ArrayList<>();
+            userDicts.put(openDictName, words);
+        }
+        return words;
     }
 
     /**
@@ -48,6 +82,10 @@ public class WordMemory {
 
     }
 
+    public Map<Long, Map<String, List<WordBase>>> getData() {
+        return this.data;
+    }
+
     /**
      * Метод для поиска слова в списке пользователя
      */
@@ -65,10 +103,70 @@ public class WordMemory {
         return null;
     }
 
+
     /**
      * Количество слов у пользователя.
      */
     public int size(long chatId) {
         return listForUser(chatId).size();
     }
+
+    /**
+     * Метод, который возвращает список словарей,
+     * созданыых пользователем
+     *
+     */
+    public List<String> getDictionaryNames(long chatId) {
+        return new ArrayList<>(dictionariesForUser(chatId).keySet());
+    }
+
+    /**
+     * Метод, для открытия словаря с нужными словами
+     *
+     */
+
+    public boolean openDictionary(long chatId, String dictName) {
+        if (dictionariesForUser(chatId).containsKey(dictName)) {
+            openDictionary.put(chatId, dictName);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Метод, который возвращает название открытого словаря
+     */
+    public String getOpenDictionary(long chatId) {
+        return openDictionary.get(chatId);
+    }
+
+    /**
+     * Метод для реализации команды добавления нового словаря
+     * Проверяет существует ли в списке словарей пользователя словарь
+     * с таким значением, если нет создает его
+     */
+    public boolean addDictionary(long chatId, String dictName) {
+        Map<String, List<WordBase>> userDicts = dictionariesForUser(chatId);
+        if (userDicts.containsKey(dictName)) {
+            return false;
+        }
+        userDicts.put(dictName, new ArrayList<>());
+        return true;
+    }
+
+
+    /**
+     * Метод для реализации команды удаления словаря
+     */
+    public boolean deleteDictionary(long chatId, String dictName) {
+        Map<String, List<WordBase>> userDicts = dictionariesForUser(chatId);
+        boolean removed = userDicts.remove(dictName) != null;
+        if (removed && dictName.equals(openDictionary.get(chatId))) {
+            openDictionary.remove(chatId);
+        }
+
+        return removed;
+    }
+
+
 }
